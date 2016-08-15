@@ -7,7 +7,6 @@ import android.widget.Button;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import uk.training.rxjava.rxjavaexercise.multicastexperiment.MulticastActivity;
 import uk.training.rxjava.rxjavaexercise.rxparralleled.ParalleledActivity;
 import uk.training.rxjava.rxjavaexercise.search.SearchActivity;
 
@@ -18,9 +17,6 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.button_input_search)
     Button buttonInputSearch;
-
-    @BindView(R.id.button_multicast)
-    Button buttonMulticast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
         buttonInputSearch.setOnClickListener(click -> {
             Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        });
-
-        buttonMulticast.setOnClickListener(click -> {
-            Intent intent = new Intent(this, MulticastActivity.class);
             startActivity(intent);
         });
     }

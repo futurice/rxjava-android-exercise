@@ -5,19 +5,21 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.SerialSubscription;
+import rx.subscriptions.CompositeSubscription;
 import uk.training.rxjava.rxjavaexercise.R;
 import uk.training.rxjava.rxjavaexercise.search.network.NetworkManager;
 import uk.training.rxjava.rxjavaexercise.utils.Logger;
@@ -25,10 +27,9 @@ import uk.training.rxjava.rxjavaexercise.utils.Logger;
 public class SearchActivity extends AppCompatActivity {
 
     private static final String TAG = SearchActivity.class.getSimpleName();
-    public List<String> test = new ArrayList();
     SearchRecyclerAdapter searchRecyclerAdapter;
 
-    private SerialSubscription subscription = new SerialSubscription();
+    private CompositeSubscription subscription = new CompositeSubscription();
 
     private NetworkManager networkManager;
 
@@ -38,6 +39,9 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
 
+    @BindView(R.id.progressBar)
+    ProgressBar spinner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,16 +50,29 @@ public class SearchActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         populateList(this);
 
-        subscription.set(RxTextView.textChanges(editText)
+        Observable<String> stringFromInput = RxTextView.textChanges(editText)
                 .observeOn(Schedulers.io())
-                .doOnNext(Logger.logOnNext(TAG, "word:"))
                 .filter(charSequence -> charSequence.length() > 3)
                 .debounce(500, TimeUnit.MILLISECONDS)
-                .doOnNext(Logger.logOnNext(TAG, "word after:"))
-                .map(word -> word.toString())
+                .map(CharSequence::toString)
+                .publish().autoConnect();
+
+        subscription.add(stringFromInput
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(word -> spinner.setVisibility(View.VISIBLE),
+                        Logger.logOnNextError(TAG)));
+
+        subscription.add(stringFromInput
                 .switchMap(searchString -> networkManager.search(searchString))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> searchRecyclerAdapter.refreshList(list), Logger.logOnNextError(TAG)));
+                .subscribe(list -> {
+                            searchRecyclerAdapter.refreshList(list);
+                            spinner.setVisibility(View.GONE);
+                        },
+                        error -> {
+                            spinner.setVisibility(View.GONE);
+                            Logger.logOnNextError(TAG);
+                        }));
     }
 
     private void populateList(Context context) {
@@ -73,6 +90,7 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        subscription.clear();
         subscription.unsubscribe();
     }
 }
