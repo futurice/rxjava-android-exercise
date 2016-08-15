@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">rxjava Exercise</string>
+
+    <string-array name="function_array">
+        <item>ReplayAutoConnect2 Experiment</item>
+        <item>ReplayConnect Experiment</item>
+        <item>ReplayAutoConnect Experiment</item>
+        <item>Publish Experiment</item>
+        <item>PublishAutoConnect Experiment</item>
+        <item>PublishAutoConnect(2) Experiment</item>
+        <item>PublishRefCount Experiment</item>
+        <item>launchPublishSubjectRefcount Experiment</item>
+    </string-array>
+</resources>
