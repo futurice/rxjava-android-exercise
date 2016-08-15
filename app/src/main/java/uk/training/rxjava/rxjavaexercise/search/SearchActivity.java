@@ -50,29 +50,29 @@ public class SearchActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         populateList(this);
 
+
+        /**
+         First exercise:
+
+         RxTextView.textChanges(editText) streams all the word created in the EditText
+         Compose with this observable to retrieve a list of github repository corresponding
+         to the search of the word written by the user.
+         to trigger a search with a word use the function networkManager.search(String wordToSearch)
+
+         we will trigger the search when the word is at least 4 letters, and the user has stopped typing
+         for 500ms.
+
+         second exercise
+         add the progress spinner when a search is started
+
+         third exercise
+         refactor the code if needed to make the business logic testable, and write the test
+         business logic, from a streams of word, only get the word more than 3 letters and only when the user
+         has stopped typing for at least 500ms.
+         */
         Observable<String> stringFromInput = RxTextView.textChanges(editText)
-                .observeOn(Schedulers.io())
-                .filter(charSequence -> charSequence.length() > 3)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .map(CharSequence::toString)
-                .publish().autoConnect();
-
-        subscription.add(stringFromInput
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(word -> spinner.setVisibility(View.VISIBLE),
-                        Logger.logOnNextError(TAG)));
-
-        subscription.add(stringFromInput
-                .switchMap(searchString -> networkManager.search(searchString))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-                            searchRecyclerAdapter.refreshList(list);
-                            spinner.setVisibility(View.GONE);
-                        },
-                        error -> {
-                            spinner.setVisibility(View.GONE);
-                            Logger.logOnNextError(TAG);
-                        }));
+                                             ...
+                                            .subscribe(list -> searchRecyclerAdapter.refreshList(list));
     }
 
     private void populateList(Context context) {
