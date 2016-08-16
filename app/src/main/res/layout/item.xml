@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
+   <ImageView
+       android:id="@+id/item_picture"
+       android:layout_width="70dp"
+       android:layout_height="70dp"
+       android:background="@android:color/holo_blue_bright" />
 
     <TextView
         android:id="@+id/item_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/item_picture"/>
 
     <TextView
         android:id="@+id/item_owner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/item_picture"
+        android:layout_below="@id/item_title"/>
 
-</LinearLayout>
+</RelativeLayout>
