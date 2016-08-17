@@ -41,27 +41,35 @@ public class PicassoWrapper {
 
 
     public Observable<Bitmap> picassoObservableLoad(String url) {
-        Integer i = requete.get(url);
-        int count = (i == null) ? 0 : i + 1;
-        requete.put(url, count);
 
-        if (!behaviorError || count > 3) {
             return Observable.create((Subscriber<? super Bitmap> subscriber) -> {
+                Logger.v(TAG, "count: " + getCount(url));
                 if (!subscriber.isUnsubscribed()) {
-                    try {
-                        Bitmap bitmap = picassoInstance.load(url).get();
-                        Logger.v(TAG, "bitmap downloaded");
-                        subscriber.onNext(bitmap);
-                        subscriber.onCompleted();
-                    } catch (Exception e) {
-                        Logger.e(TAG, "Error downloading the bitmap: " + e.getMessage());
-                        subscriber.onError(e);
+                    if (!behaviorError || getCount(url) > 2) {
+                        try {
+                            Bitmap bitmap = picassoInstance.load(url).get();
+                            Logger.v(TAG, "bitmap downloaded");
+                            subscriber.onNext(bitmap);
+                            subscriber.onCompleted();
+                        } catch (Exception e) {
+                            Logger.e(TAG, "Error downloading the bitmap: " + e.getMessage());
+                            subscriber.onError(e);
+                        }
+                    } else {
+                        incrementCount(url);
+                        subscriber.onError(new NoImageException("no picture"));
                     }
                 }
             }).subscribeOn(io());
-        } else {
-            return Observable.error(new NoImageException("no picture"));
-        }
+    }
+
+    int getCount(String url) {
+        Integer i = requete.get(url);
+        return (i == null) ? 0 : i;
+    }
+
+    void incrementCount(String url) {
+        requete.put(url, getCount(url) + 1);
     }
 
 
