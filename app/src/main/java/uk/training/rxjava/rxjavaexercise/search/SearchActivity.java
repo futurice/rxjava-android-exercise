@@ -52,8 +52,8 @@ public class SearchActivity extends AppCompatActivity {
 
         Observable<String> stringFromInput = RxTextView.textChanges(editText)
                 .observeOn(Schedulers.io())
-                .filter(charSequence -> charSequence.length() > 3)
                 .debounce(500, TimeUnit.MILLISECONDS)
+                .filter(charSequence -> charSequence.length() > 3)
                 .map(CharSequence::toString)
                 .publish().autoConnect();
 
