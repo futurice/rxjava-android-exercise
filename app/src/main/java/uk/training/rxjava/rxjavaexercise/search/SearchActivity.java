@@ -55,11 +55,7 @@ public class SearchActivity extends AppCompatActivity {
          * 500Ms
          */
         Observable<String> stringFromInput = RxTextView.textChanges(editText)
-                .observeOn(Schedulers.io())
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .filter(charSequence -> charSequence.length() > 3)
-                .map(CharSequence::toString)
-                .publish().autoConnect();
+                ....;
 
         subscription.add(stringFromInput
                 .observeOn(AndroidSchedulers.mainThread())
@@ -70,17 +66,8 @@ public class SearchActivity extends AppCompatActivity {
          * for each word from the search, fetch the list , and update the content using searchRecyclerAdapter.refreshList(list);
          * and remove the spinner
          */
-        subscription.add(stringFromInput
-                .switchMap(searchString -> networkManager.search(searchString))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> {
-                            searchRecyclerAdapter.refreshList(list);
-                            spinner.setVisibility(View.GONE);
-                        },
-                        error -> {
-                            spinner.setVisibility(View.GONE);
-                            Logger.logOnNextError(TAG);
-                        }));
+        subscription.add(stringFromInput.
+                ....);
     }
 
     private void populateList(Context context) {
