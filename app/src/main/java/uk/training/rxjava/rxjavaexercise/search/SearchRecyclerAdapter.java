@@ -1,14 +1,16 @@
 package uk.training.rxjava.rxjavaexercise.search;
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+<<<<<<< 40678e70a55a37ac17076f6d31feb05ce4de1e25
 <<<<<<< bd57120e5cb5d331d1ffcd017ad9a05fb24d5b3b
 =======
 import android.widget.ImageButton;
 >>>>>>> error handling
+=======
+>>>>>>> implementation retryWhen
 import android.widget.ImageView;
 import android.widget.TextView;
 

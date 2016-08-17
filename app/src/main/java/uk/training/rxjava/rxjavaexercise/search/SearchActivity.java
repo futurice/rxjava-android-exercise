@@ -38,11 +38,8 @@ public class SearchActivity extends AppCompatActivity {
 
     private NetworkManager networkManager;
     private PicassoWrapper picassoWrapper;
-<<<<<<< bd57120e5cb5d331d1ffcd017ad9a05fb24d5b3b
-    private boolean userRetryWhen = false;
-=======
     private boolean checkedErrorBehavior = false;
->>>>>>> error handling
+    private boolean userRetryWhen = false;
 
     @BindView(R.id.editText)
     EditText editText;
