@@ -13,12 +13,14 @@ import android.widget.RadioButton;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import uk.training.rxjava.rxjavaexercise.R;
@@ -36,7 +38,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private NetworkManager networkManager;
     private PicassoWrapper picassoWrapper;
-    private boolean checkedErrorBehavior = false;
+    private boolean userRetryWhen = false;
 
     @BindView(R.id.editText)
     EditText editText;
@@ -86,16 +88,13 @@ public class SearchActivity extends AppCompatActivity {
                         .flatMap(list -> Observable.from(list)
                                 .take(4)
                                 .flatMap(item -> Observable.just(item)
-                                        .zipWith(picassoWrapper
-                                                        .picassoObservableLoad(
-                                                                item.getOwner().getAvatarUrl()
-                                                        ).onErrorResumeNext(throwable -> {
-                                                    if (throwable instanceof NoImageException) {
-                                                         return Observable.just(null);
-                                                    }
-                                                    else return Observable.error(throwable);
-                                                }), (gitHubRepository, bitmap) -> {
-                                                    return new InfoDisplay(bitmap, gitHubRepository.getName(), "" + gitHubRepository.getForksCount());
+                                        .zipWith(userRetryWhen
+                                                ? fetchBitmapFromUrlWithRetryWhen(item.getOwner().getAvatarUrl())
+                                                : fetchBitmapFromUrl(item.getOwner().getAvatarUrl()),
+                                                (gitHubRepository, bitmap) -> {
+                                                    return new InfoDisplay(bitmap,
+                                                            gitHubRepository.getName(),
+                                                            "" + gitHubRepository.getForksCount());
                                                 }
                                         ))
                                 .toList()))
@@ -110,6 +109,51 @@ public class SearchActivity extends AppCompatActivity {
                         }));
     }
 
+    /**
+     * fetch bitmap from url.
+     * add some error handling that if we receive a NoImageException, we return null.
+     * for other one we propagate the error.
+     *
+     * exercise implement this function
+     * @param url
+     * @return
+     */
+    private Observable<Bitmap> fetchBitmapFromUrl(String url) {
+        return picassoWrapper
+                .picassoObservableLoad(url)
+                .onErrorResumeNext(throwable -> {
+                    if (throwable instanceof NoImageException) {
+                        return Observable.just(null);
+                    } else {
+                        return Observable.error(throwable);
+                    }
+                });
+    }
+
+    /**
+     * fetch bitmap from url.
+     * add some retry function that if we receive some exception we retry the download at least three time.
+     *
+     * exercise, implement the RetryWithDelay class.
+     *
+     * to use the functionality in the app, set up userRetryWhen to true at the beginning of this class
+     *
+     * @param url
+     * @return
+     */
+    private Observable<Bitmap> fetchBitmapFromUrlWithRetryWhen(String url) {
+        return picassoWrapper
+                .picassoObservableLoad(url)
+                .retryWhen(new RetryWithDelay(3, 100))
+                .onErrorResumeNext(throwable -> {
+                    if (throwable instanceof NoImageException) {
+                        return Observable.just(null);
+                    } else {
+                        return Observable.error(throwable);
+                    }
+                });
+    }
+    
     private void populateList(Context context) {
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
