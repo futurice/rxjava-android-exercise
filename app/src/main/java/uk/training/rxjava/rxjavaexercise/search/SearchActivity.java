@@ -50,6 +50,10 @@ public class SearchActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         populateList(this);
 
+        /**
+         * observable which send word that is more than 3 letters, and is send after the user has not typed anything for at least
+         * 500Ms
+         */
         Observable<String> stringFromInput = RxTextView.textChanges(editText)
                 .observeOn(Schedulers.io())
                 .debounce(500, TimeUnit.MILLISECONDS)
@@ -62,6 +66,10 @@ public class SearchActivity extends AppCompatActivity {
                 .subscribe(word -> spinner.setVisibility(View.VISIBLE),
                         Logger.logOnNextError(TAG)));
 
+        /**
+         * for each word from the search, fetch the list , and update the content using searchRecyclerAdapter.refreshList(list);
+         * and remove the spinner
+         */
         subscription.add(stringFromInput
                 .switchMap(searchString -> networkManager.search(searchString))
                 .observeOn(AndroidSchedulers.mainThread())
