@@ -33,22 +33,6 @@ public class RetryWithDelay implements
 
     @Override
     public Observable<?> call(Observable<? extends Throwable> attempts) {
-        return attempts
-                .flatMap(throwable -> {
-                    if (retryCount++ < maxRetries) {
-                        // When this Observable calls onNext, the original
-                        // Observable will be retried (i.e. re-subscribed).
-                        Logger.v(TAG, "let s retry");
-                        return scheduler != null ? Observable.timer(getRetryDelayMillis(retryCount), TimeUnit.MILLISECONDS, scheduler)
-                                : Observable.timer(getRetryDelayMillis(retryCount), TimeUnit.MILLISECONDS);
-                    }
-                    Logger.v(TAG, "let s propagate the error");
-                    // Max retries hit. Just pass the error along.
-                    return Observable.error(throwable);
-                });
-    }
-
-    private int getRetryDelayMillis(int numRetry) {
-        return (int) Math.pow(2, numRetry) * retryDelayMillis;
+        return null;
     }
 }

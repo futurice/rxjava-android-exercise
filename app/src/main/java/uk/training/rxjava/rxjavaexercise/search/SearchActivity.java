@@ -101,13 +101,8 @@ public class SearchActivity extends AppCompatActivity {
                                 .toList()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> {
-                            searchRecyclerAdapter.refreshList(list);
-                            spinner.setVisibility(View.GONE);
-                        },
-                        error -> {
-                            spinner.setVisibility(View.GONE);
-                            Logger.logOnNextError(TAG);
-                        }));
+                    searchRecyclerAdapter.refreshList(list);
+                    spinner.setVisibility(View.GONE);}));
     }
 
     /**
@@ -116,19 +111,15 @@ public class SearchActivity extends AppCompatActivity {
      * for other one we propagate the error.
      *
      * exercise implement this function
+     *
+     * ADD SOME ERROR HANDLING HERE
+     *
      * @param url
      * @return
      */
     private Observable<Bitmap> fetchBitmapFromUrl(String url) {
         return picassoWrapper
-                .picassoObservableLoad(url)
-                .onErrorResumeNext(throwable -> {
-                    if (throwable instanceof NoImageException) {
-                        return Observable.just(null);
-                    } else {
-                        return Observable.error(throwable);
-                    }
-                });
+                .picassoObservableLoad(url);  // add error handling at the end of this observable
     }
 
     /**
@@ -139,22 +130,17 @@ public class SearchActivity extends AppCompatActivity {
      *
      * to use the functionality in the app, set up userRetryWhen to true at the beginning of this class
      *
+     * IMPLEMENT THE RetryWithDelay classs
+     *
      * @param url
      * @return
      */
     private Observable<Bitmap> fetchBitmapFromUrlWithRetryWhen(String url) {
         return picassoWrapper
                 .picassoObservableLoad(url)
-                .retryWhen(new RetryWithDelay(3, 100))
-                .onErrorResumeNext(throwable -> {
-                    if (throwable instanceof NoImageException) {
-                        return Observable.just(null);
-                    } else {
-                        return Observable.error(throwable);
-                    }
-                });
+                .retryWhen(new RetryWithDelay(3, 100));
     }
-    
+
     private void populateList(Context context) {
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
