@@ -14,10 +14,10 @@ public class RetryWithDelay implements
         Func1<Observable<? extends Throwable>, Observable<?>> {
 
     private static final String TAG = RetryWithDelay.class.getSimpleName();
-    private final int maxRetries;
-    private final int retryDelayMillis;
+    private  int maxRetries;
+    private  int retryDelayMillis;
     private int retryCount;
-    private final Scheduler scheduler;
+    private  Scheduler scheduler = null;
 
     public RetryWithDelay(final int maxRetries, final int retryDelayMillis, Scheduler scheduler) {
         this.maxRetries = maxRetries;
