@@ -121,13 +121,7 @@ public class SearchActivity extends AppCompatActivity {
     private Observable<Bitmap> fetchBitmapFromUrl(String url) {
         return picassoWrapper
                 .picassoObservableLoad(url)
-                .onErrorResumeNext(throwable -> {
-                    if (throwable instanceof NoImageException) {
-                        return Observable.just(null);
-                    } else {
-                        return Observable.error(throwable);
-                    }
-                });
+                ...;
     }
 
     /**
